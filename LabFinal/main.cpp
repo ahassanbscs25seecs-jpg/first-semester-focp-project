@@ -8,9 +8,9 @@
 
 struct TableEntry {
 	int id;
-	std::string password;
 	std::string username;
 	std::string siteURL;
+	std::string password;
 };
 
 /**
@@ -30,45 +30,6 @@ void printTitle() {
 	std::cout << "PassGen\n"
 		      << "-------\n" << std::endl;
 }
-//
-//void add_new_password(std::string filename) {
-//	clear_screen();
-//
-//	std::cout << "Do you want to generate a password (y/n)";
-//
-//	TableEntry new_entry;
-//	char option;
-//
-//	do {
-//		std::cin.seekg(SEEK_END, 0);
-//		std::cout << "> ";
-//		std::cin >> option;
-//
-//		if (option != 'y' && option != 'n') {
-//			std::cout << "Invalid option!" << std::endl;
-//		}
-//	} while (option != 'y' && option != 'n');
-//	
-//	std::string password;
-//
-//	switch (option) {
-//	case 'y':
-//	case 'n':
-//	}
-//
-//	std::cout << "Enter a username: ";
-//	std::cin >> new_entry.username;
-//
-//	std::cout << "Enter a site url: ";
-//	std::cin >> new_entry.site_url;
-//
-//	/* Put the url into our password file. */
-//	std::fstream f(filename);
-//	f.seekg(std::ios::end);
-//
-//	f.close();
-//}
-//
 
 std::vector<TableEntry> readCSVFile(const std::string& filename) {
 	std::fstream f(filename);
@@ -149,19 +110,47 @@ std::vector<TableEntry> searchBySiteURL(const std::vector<TableEntry>& table, co
 	return result;
 }
 
+/**
+ * printTable:
+ *   Print the password table to the terminal in an easy to read manner.
+ *
+ * Arguements:
+ *   -> table: The table we want to print to the terminal.
+ *
+ * Return value:
+ *   Returns nothing.
+ */
+void printTable(const std::vector<TableEntry>& table) {
+	std::cout << std::left
+		<< std::setw(8) << "ID"
+		<< std::setw(15) << "Username"
+		<< std::setw(25) << "Site URL"
+		<< std::setw(20) << "Password"
+		<< "\n-------------------------------------------------------------" << std::endl;
+
+	for (const auto& e : table) {
+		std::cout << std::left
+			<< std::setw(8) << e.id
+			<< std::setw(15) << e.username
+			<< std::setw(25) << e.siteURL
+			<< std::setw(20) << e.password
+			<< std::endl;
+	}
+}
+
 int main() {
 	printTitle();
 
 	int option = 0;
 	bool done = false;
 
-	std::string passFilename;
+	std::string passFilename = "C:\\Users\\agha waleed agha\\Documents\\bruh.csv";
 
 	/* Read user options. */
 	/* Take the appropriate action. */
 
-	std::cout << "Enter the password filename: ";
-	std::cin >> passFilename;
+	/*std::cout << "Enter the password filename: ";
+	std::cin >> passFilename;*/
 
 	std::vector<TableEntry> table = readCSVFile(passFilename);
 
@@ -173,58 +162,106 @@ int main() {
 			  << "2) Search for passwords\n"
 			  << "3) Quit" << std::endl;
 
-	do {
-		std::cout << "> ";
-		std::cin >> option;
-		
-		switch (option) {
-		case 1:
-			done = true;
+	while (true) {
+		clearScreen();
+		printTitle();
 
-			break;
+		std::cout << "Enter an action\n"
+				  << "1) Enter a new password\n"
+				  << "2) Search for passwords\n"
+				  << "3) Quit" << std::endl;
 
-		case 2: {
-			done = true;
-			clearScreen();
-			printTitle();
-
-			std::vector<TableEntry> searchResults;
-			int option = 0;
-
-			std::cout << "What do you want to search with?\n"
-				<< "1) Username\n"
-				<< "2) Site URL\n" << std::endl;
-
-			do {
-				std::cout << "> ";
-				std::cin >> option;
-				
-				if (option != 1 && option != 2) {
-					std::cout << "Wrong option!" << std::endl;
-				}
-			} while (option != 1 && option != 2);
+		do {
+			std::cout << "> ";
+			std::cin >> option;
 
 			switch (option) {
 			case 1:
-				searchResults = searchByUsername(table, );
-				break;
-				
-			case 2:
+				done = true;
 
+				break;
+
+			case 2: {
+				done = true;
+				clearScreen();
+				printTitle();
+
+				std::vector<TableEntry> searchResults;
+				int option = 0;
+
+				std::cout << "What do you want to search with?\n"
+						  << "1) Username\n"
+					      << "2) Site URL" << std::endl;
+
+				do {
+					std::cout << "> ";
+					std::cin >> option;
+
+					if (option != 1 && option != 2) {
+						std::cout << "Wrong option!" << std::endl;
+					}
+				} while (option != 1 && option != 2);
+
+				switch (option) {
+				case 1: {
+					std::string username;
+
+					std::cout << "\nEnter the username" << std::endl;
+					do {
+						std::cout << "> ";
+						std::cin.ignore(1);
+						std::getline(std::cin, username);
+
+						std::cout << "'" << username << "'" << std::endl;
+
+						if (username.length() == 0) {
+							std::cout << "Username can't be empty!" << std::endl;
+						}
+					} while (username.length() == 0);
+
+					searchResults = searchByUsername(table, username);
+
+					break;
+				}
+
+				case 2: {
+					std::string siteURL;
+
+					std::cout << "Enter the site url" << std::endl;
+					do {
+						std::cout << "> ";
+						std::cin.ignore(1);
+						std::getline(std::cin, siteURL);
+
+						if (siteURL.length() == 0) {
+							std::cout << "Site URL can't be empty!" << std::endl;
+						}
+					} while (siteURL.length() == 0);
+
+					searchResults = searchBySiteURL(table, siteURL);
+
+					break;
+				}
+				}
+
+				printTable(searchResults);
+
+				std::cout << "\nPress any key to continue..." << std::endl;
+				(void)std::getchar();
+
+				break;
 			}
 
-			break;
-		}
+			case 3:
+				done = true;
+				return 0;
 
-		case 3:
-			done = true;
-			return 0;
-
-		default:
-			std::cout << "Invalid option!" << std::endl;
-			break;
-		}
-	} while (!done);
+			default:
+				std::cout << "Invalid option!" << std::endl;
+				break;
+			}
+		} while (!done);
+	}
 
 	return 0;
 }
