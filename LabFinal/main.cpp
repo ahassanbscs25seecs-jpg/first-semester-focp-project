@@ -154,14 +154,6 @@ int main() {
 
 	std::vector<TableEntry> table = readCSVFile(passFilename);
 
-	clearScreen();
-	printTitle();
-
-	std::cout << "Enter an action\n"
-			  << "1) Enter a new password\n"
-			  << "2) Search for passwords\n"
-			  << "3) Quit" << std::endl;
-
 	while (true) {
 		clearScreen();
 		printTitle();
